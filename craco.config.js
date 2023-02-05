@@ -3,6 +3,6 @@
 /* eslint-disable global-require */
 module.exports = {
   plugins: [
-    { plugin: require("craco-antd") }
+    { plugin: require('craco-antd') }
   ],
 };

@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
-import { FiLogIn, FiInfo } from 'react-icons/fi';
-import { Card, Divider, Form, Input, Button } from 'antd';
+import { FiInfo } from 'react-icons/fi';
+import { Alert, Card, Divider, Form, Input, Button } from 'antd';
 
+import { useAuth } from 'app/hooks';
+import { useHistory } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
+import { useSelector } from 'react-redux';
+
+import logo from 'app/assets/images/logo.png';
 import packageJson from '../../../package.json';
 
 const StyledCard = styled(Card)`
@@ -19,8 +25,14 @@ const StyledCard = styled(Card)`
   }
 `;
 
+const ImageWrapper = styled.div`
+  height: 250px;
+  > img {
+    padding-top: 25px;
+  }
+`;
 const VersionWrapper = styled.div`
-  color: rgba(0,0,0,.4);  
+  color: rgba(0, 0, 0, .4);  
 `;
 const IconWrapper = styled.span`
   margin-right: 8px;
@@ -28,19 +40,104 @@ const IconWrapper = styled.span`
 `;
 
 const LoginPage = () => {
+  const {
+    control,
+    errors,
+    setError,
+    clearErrors,
+    handleSubmit,
+  } = useForm();
+
+  const { login } = useAuth();
+  const history = useHistory();
+
+  const { loginLoading } = useSelector((_) => _.auth);
+
+  const loading = loginLoading;
+
+  const defaultValue = useMemo(() => ({
+    username: '',
+    password: '',
+  }), []);
+
+  const rules = useMemo(() => ({
+    username: { required: true },
+    password: { required: true },
+  }), []);
+
+  const onSubmit = (payload) => {
+    const { username, password } = payload;
+
+    login(username, password, false)
+      .then(() => setTimeout(() => history.push('/home'), 300))
+      .catch((error) => {
+        setError('invalid', error ?? { type: '', message: '' });
+      });
+  };
+
   return (
     <StyledCard bordered>
-      <Form layout="vertical">
-        <Form.Item name="username">
-          <Input placeholder="Username" />
-        </Form.Item>
-        <Form.Item name="password">
-          <Input placeholder="Password" />
-        </Form.Item>
+      <ImageWrapper>
+        <img src={logo} alt="logo" />
+      </ImageWrapper>
+      <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+        <Controller
+          name="username"
+          control={control}
+          rules={rules.username}
+          defaultValue={defaultValue.username}
+          render={({ onChange, onBlur, value }) => (
+            <Form.Item name="username">
+              <Input
+                placeholder="Username"
+                value={value}
+                onChange={(event) => {
+                  clearErrors('invalid');
+                  onChange(event);
+                }}
+                onBlur={onBlur}
+              />
+            </Form.Item>
+          )}
+        />
+        <Controller
+          name="password"
+          control={control}
+          rules={rules.password}
+          defaultValue={defaultValue.password}
+          render={({ onChange, onBlur, value }) => (
+            <Form.Item name="password">
+              <Input
+                type="password"
+                placeholder="Password"
+                value={value}
+                onChange={(event) => {
+                  clearErrors('invalid');
+                  onChange(event);
+                }}
+                onBlur={onBlur}
+              />
+            </Form.Item>
+          )}
+        />
         <Form.Item>
-          <Button block type="primary">Login</Button>
+          <Button
+            block
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+          >
+            Login
+          </Button>
         </Form.Item>
       </Form>
+      {errors.invalid && (
+        <Alert
+          showIcon
+          type="error"
+          message={errors.invalid.message || 'The Username or Password is Incorrect'}
+        />
+      )}
       <Divider style={{ marginTop: '10px', marginBottom: '14px' }} />
       <VersionWrapper>
         <IconWrapper>
@@ -49,7 +146,7 @@ const LoginPage = () => {
         {packageJson.version}
       </VersionWrapper>
     </StyledCard>
-  )
-}
+  );
+};
 
 export default LoginPage;

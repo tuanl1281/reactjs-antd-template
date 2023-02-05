@@ -1,33 +1,53 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Navigate } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 
 import { useAuth } from 'app/hooks';
 
-const AppRoute = ({ layout: Layout, children, isPrivate }) => {
+const AppRoute = ({
+  component: Component,
+  layout: Layout,
+  path,
+  exact,
+  isPrivate,
+}) => {
   const { isAuthenticated } = useAuth();
-  /* Validate */
-  if (isPrivate && !isAuthenticated())
-    return <Navigate to='/' />
-  /* For layout */
-  if (Layout) {
-    return (
-      <Layout>
-        {children}
-      </Layout>
-    );
-  }
 
-  return children;
+  return (
+    <Route
+      key={path || '404'}
+      path={path}
+      exact={exact}
+      render={() => {
+        /* Authentication */
+        if (isPrivate && !isAuthenticated()) return <Redirect to="/" />;
+        /* Return */
+        if (Layout) {
+          return (
+            <Layout>
+              <Component />
+            </Layout>
+          );
+        }
+
+        return <Component />;
+      }}
+    />
+  );
 };
 
 AppRoute.propTypes = {
+  component: PropTypes.elementType.isRequired,
   layout: PropTypes.elementType,
+  path: PropTypes.string,
+  exact: PropTypes.bool,
   isPrivate: PropTypes.bool,
 };
 
 AppRoute.defaultProps = {
   layout: null,
+  path: undefined,
+  exact: false,
   isPrivate: false,
 };
 

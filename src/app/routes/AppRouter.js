@@ -1,31 +1,29 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Switch } from 'react-router-dom';
 
 import AppRoute from './AppRoute';
 import routes from './routes';
 
 const AppRouter = () => (
   <BrowserRouter>
-    <Routes>
+    <Switch>
       {routes.map(({
-        component: Component,
-        layout: Layout,
+        component,
+        layout,
         path,
         exact,
         isPrivate,
       }) => (
-        <Route
+        <AppRoute
           key={path || '404'}
+          component={component}
+          layout={layout}
           path={path}
           exact={exact}
-          element={
-            <AppRoute isPrivate={isPrivate} layout={Layout}>
-              <Component />
-            </AppRoute>
-          }
+          isPrivate={isPrivate}
         />
       ))}
-    </Routes>
+    </Switch>
   </BrowserRouter>
 );
 
