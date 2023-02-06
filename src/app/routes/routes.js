@@ -1,4 +1,3 @@
-import AppLayout from 'app/components/layout';
 import LandingPage from 'app/pages/LandingPage';
 import LoginPage from 'app/pages/LoginPage';
 import PageNotFound from 'app/pages/PageNotFound';
@@ -29,7 +28,7 @@ const routes = [
   {
     path: '/tasks',
     component: TaskPage,
-    layout: AppLayout,
+    layout: null,
     isPrivate: true,
     exact: true,
   },

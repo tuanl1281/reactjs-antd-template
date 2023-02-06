@@ -60,7 +60,8 @@ const getUserInfo = (token) => (dispatch) =>
       url: apiLinks.getUserInfo,
       headers: { ...headerToken },
     })
-      .then(({ data: { data } }) => {
+      .then((response) => {
+        const data = response?.data?.data ?? {};
         dispatch(getUserInfoSuccess(data));
         resolve(data);
       })

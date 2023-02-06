@@ -7,6 +7,13 @@ const gatewayUrl = isDev
 const apiLinks = {
   login: `${gatewayUrl}/users/login`,
   getUserInfo: `${gatewayUrl}/users/information`,
+  task: {
+    get: (id) => `${gatewayUrl}/tasks${id ? `/${id}` : ''}`,
+    create: () => `${gatewayUrl}/tasks`,
+    update: (id) => `${gatewayUrl}/tasks/${id}`,
+    delete: (id) => `${gatewayUrl}/tasks/${id}`,
+    complete: (id) => `${gatewayUrl}/tasks/${id}/complete`
+  }
 };
 
 export default apiLinks;
